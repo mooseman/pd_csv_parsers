@@ -1,0 +1,10 @@
+   README - PD csv parsers  
+Just a few public-domain parsers for csv files.  
+CSV parsers tend to be something that people often search for on the 'net. 
+Although languages like Python and Ruby have built-in parsers for csv, there may 
+be times when another solution is wanted or needed. 
+
+As usual, the code here is released to the public domain. 
+"Share and enjoy....... "  ;) 
+
+
