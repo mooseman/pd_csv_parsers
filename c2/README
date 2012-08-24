@@ -1,0 +1,155 @@
+
+A very nice P.D. csv parser by Phil Bewig. 
+Many thanks to Phil for writing this code and releasing 
+it as "public domain".   
+
+( The code, as it is, converts data from csv to 
+char-delimited, but it could easily be adapted to do 
+other things - e.g. store the read-in data. )   
+
+The code is from here - 
+https://groups.google.com/forum/?fromgroups
+=#!msg/comp.lang.awk/1aMF1Z3TG7k/-f9wtRQVloYJ 
+
+Below, I've included a couple of paragraphs of his comment 
+from the comp.lang.awk list. This gives some context for the code.  
+
+********************************************** 
+(snipped earlier comments)  
+
+Because of the difficulty of dealing with csv files in awk, it is a
+reasonable alternative to preprocess a csv file with a purpose-built
+tool that creates a character-delimited file.  As the example below
+shows, this allows awk programs to remain simple, and the preprocessor
+is useful with other unix text-processing tools that assume character-
+delimited data.
+
+The attached program is such a preprocessor, written in C.  It allows
+options to handle various input and output field separators, and is
+much faster than any pure-awk solution, even with the extra pass over
+over the data.  Simply extract the code from this message, save it in
+a file called csv.c, compile it as shown,
+
+    DOS, Windows, OS/2                    Unix systems
+    ----------------------                -----------------
+    C> cc -o csv.exe csv.c                $ cc -o csv csv.c
+                                                       $ chmod +x csv
+
+and put it somewhere in your path.
+
+I appreciate your comments.
+
+
+/* NAME
+ *
+ *     csv -- convert comma-separated values file to character-delimited
+ *
+ *
+ * SYNOPSIS
+ *
+ *     csv [-Cc] [-Fc] [filename ...]
+ *
+ *
+ * DESCRIPTION
+ *
+ *     Csv reads from standard input or from one or more files named on
+ *     the command line a sequence of records in comma-separated values
+ *     format and writes on standard output the same records in character-
+ *     delimited format.  Csv returns 0 on success, 1 for option errors,
+ *     and 2 if any file couldn't be opened.
+ *
+ *     The comma-separated values format has developed over time as a
+ *     set of conventions that has never been formally defined, and some
+ *     implementations are in conflict about some of the details.  In
+ *     general, the comma-separated values format is used by databases,
+ *     spreadsheets, and other programs that need to write data consisting
+ *     of records containing fields.  The data is written as ascii text,
+ *     with records terminated by newlines and fields containing zero or
+ *     more characters separated by commas.  Leading and trailing space in
+ *     unquoted fields is preserved.  Fields may be surrounded by double-
+ *     quote characters (ascii \042); such fields may contain newlines,
+ *     literal commas (ascii \054), and double-quote characters
+ *     represented as two successive double-quotes.  The examples shown
+ *     below clarify many irregular situations that may arise.
+ *
+ *     The field separator is normally a comma, but can be changed to an
+ *     arbitrary character c with the command line option -Cc.  This is
+ *     useful in those european countries that use a comma instead of a
+ *     decimal point, where the field separator is normally changed to a
+ *     semicolon.
+ *
+ *     Character-delimited format has records terminated by newlines and
+ *     fields separated by a single character, which is \034 by default
+ *     but may be changed with the -Fc option on the command line.
+ *
+ *
+ * EXAMPLE
+ *
+ *     Each record below has five fields.  For readability, the three-
+ *     character sequence TAB represents a single tab character (ascii
+ *     \011).
+ *
+ *         $ cat testdata.csv
+ *         1,abc,def ghi,jkl,unquoted character strings
+ *         2,"abc","def ghi","jkl",quoted character strings
+ *         3,123,456,789,numbers
+ *         4,   abc,def   ,   ghi   ,strings with whitespace
+ *         5,   "abc","def"   ,   "ghi"   ,quoted strings with whitespace
+ *         6,   123,456   ,   789   ,numbers with whitespace
+ *         7,TAB123,456TAB,TAB789TAB,numbers with tabs for whitespace
+ *         8,   -123,   +456,   1E3,more numbers with whitespace
+ *         9,123 456,123"456,  123 456   ,strange numbers
+ *         10,abc",de"f,g"hi,embedded quotes
+ *         11,"abc""","de""f","g""hi",quoted embedded quotes
+ *         12,"","" "",""x"",doubled quotes
+ *         13,"abc"def,abc"def","abc" "def",strange quotes
+ *         14,,"",   ,empty fields
+ *         15,abc,"def
+ *         ghi",jkl,embedded newline
+ *         16,abc,"def",789,multiple types of fields
+ *
+ *         $ csv -F'|' testdata.csv
+ *         1|abc|def ghi|jkl|unquoted character strings
+ *         2|abc|def ghi|jkl|quoted character strings
+ *         3|123|456|789|numbers
+ *         4|   abc|def   |   ghi   |strings with whitespace
+ *         5|   "abc"|def   |   "ghi"   |quoted strings with whitespace
+ *         6|   123|456   |   789   |numbers with whitespace
+ *         7|TAB123|456TAB|TAB789TAB|numbers with tabs for whitespace
+ *         8|   -123|   +456|   1E3|more numbers with whitespace
+ *         9|123 456|123"456|  123 456   |strange numbers
+ *         10|abc"|de"f|g"hi|embedded quotes
+ *         11|abc"|de"f|g"hi|quoted embedded quotes
+ *         12|| ""|x""|doubled quotes
+ *         13|abcdef|abc"def"|abc "def"|strange quotes
+ *         14|||   |empty fields
+ *         15|abc|def
+ *         ghi|jkl|embedded newline
+ *         16|abc|def|789|multiple types of fields
+ *
+ *     It is particularly easy to pipe the output from csv into any of
+ *     the unix tools that accept character-delimited fielded text data
+ *     files, such as sort, join, or cut.  For example:
+ *
+ *         csv datafile.csv | awk -F'\034' -f program.awk
+ *
+ *
+ * BUGS
+ *
+ *     On DOS, Windows, and OS/2 systems, processing of each file stops
+ *     at the first appearance of the ascii \032 (control-Z) end of file
+ *     character.
+ *
+ *     Because newlines embedded in quoted fields are treated literally,
+ *     a missing closing quote can suck up all remaining input.
+ *
+ *
+ * LICENSE
+ *
+ *     This program was written by Philip L. Bewig of Saint Louis,
+ *     Missouri, United States of America on February 28, 2002 and
+ *     placed in the public domain.
+ */
+
+
+
